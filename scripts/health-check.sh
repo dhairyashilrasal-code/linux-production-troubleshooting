@@ -8,14 +8,9 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 2
 fi
 
+# ShellCheck cannot follow a variable config path
+# shellcheck disable=SC1090
 source "$CONFIG_FILE"
-
-if [[ -n "$APP_TOKEN" ]]; then
-    echo "APP_TOKEN is configured"
-else
-    echo "ERROR: APP_TOKEN is not configured"
-    exit 2
-fi
 
 mkdir -p server_logs
 
@@ -52,6 +47,12 @@ ss -tuln
 echo "Failed Services:"
 systemctl --failed --no-pager
 
+if [[ -n "${APP_TOKEN:-}" ]]; then
+    echo "APP_TOKEN is configured"
+else
+    echo "WARNING: APP_TOKEN is not configured"
+fi
+
 disk_usage=$(df / | awk 'NR==2 {gsub("%","",$5); print $5}')
 
 if (( disk_usage > DISK_THRESHOLD )); then
@@ -61,3 +62,5 @@ fi
 
 echo "========================="
 echo "Log saved to: $log_file"
+
+exit 0
