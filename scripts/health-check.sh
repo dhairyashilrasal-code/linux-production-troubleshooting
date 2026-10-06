@@ -8,8 +8,14 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 2
 fi
 
-# shellcheck disable=SC1090
 source "$CONFIG_FILE"
+
+if [[ -n "$APP_TOKEN" ]]; then
+    echo "APP_TOKEN is configured"
+else
+    echo "ERROR: APP_TOKEN is not configured"
+    exit 2
+fi
 
 mkdir -p server_logs
 
@@ -19,12 +25,19 @@ log_file="server_logs/server_health_${timestamp}.log"
 exec > >(tee "$log_file") 2>&1
 
 echo "===== SERVER HEALTH ====="
+
 echo "Environment: ${ENVIRONMENT:-local}"
+
 echo "Hostname: $(hostname)"
+
 echo "Uptime: $(uptime -p)"
+
 echo "Load Average: $(uptime | awk -F'load average: ' '{print $2}')"
+
 echo "CPU: $(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8 "%"}')"
+
 echo "Memory: $(free -h | awk '/Mem:/ {print $3 " used / " $2 " total"}')"
+
 echo "Disk: $(df -h / | awk 'NR==2 {print $3 " used / " $2 " total (" $5 ")"}')"
 
 echo "Top CPU Process:"
@@ -48,5 +61,3 @@ fi
 
 echo "========================="
 echo "Log saved to: $log_file"
-
-exit 0
