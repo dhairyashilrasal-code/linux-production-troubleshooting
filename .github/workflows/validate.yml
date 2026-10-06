@@ -2,6 +2,7 @@ name: Shell Validation
 
 env:
   ENVIRONMENT: test
+  APP_TOKEN: ${{ secrets.APP_TOKEN }}
 
 on:
   push:
@@ -34,4 +35,6 @@ jobs:
         run: chmod +x scripts/health-check.sh
 
       - name: Run health check
+        env:
+          APP_TOKEN: ${{ secrets.APP_TOKEN }}
         run: ./scripts/health-check.sh
