@@ -8,6 +8,7 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 2
 fi
 
+# shellcheck disable=SC1090
 source "$CONFIG_FILE"
 
 mkdir -p server_logs
@@ -47,3 +48,5 @@ fi
 
 echo "========================="
 echo "Log saved to: $log_file"
+
+exit 0
